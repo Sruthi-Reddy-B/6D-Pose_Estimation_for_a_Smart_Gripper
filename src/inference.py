@@ -9,7 +9,7 @@ from utils import draw_axes, euler_to_rotmat, ensure_dir
 # --- Paths ---
 #MODEL_PATH = "results/yolo_model/yolov8_6d_pose.pt"
 
-MODEL_PATH = "yolov8n.pt"  # pre-trained YOLOv8 nano weights
+MODEL_PATH = "yolov8n.pt"  # pre-trained YOLOv8 downloaded in repo root
 
 IMAGE_PATH = "../data/images/object_1.jpg"
 POSE_CSV = "../data/poses/pose_labels.csv"
