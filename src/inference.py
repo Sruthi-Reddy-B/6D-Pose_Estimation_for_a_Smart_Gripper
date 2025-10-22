@@ -7,7 +7,10 @@ from ultralytics import YOLO
 from utils import draw_axes, euler_to_rotmat, ensure_dir
 
 # --- Paths ---
-MODEL_PATH = "results/yolo_model/yolov8_6d_pose.pt"
+#MODEL_PATH = "results/yolo_model/yolov8_6d_pose.pt"
+
+MODEL_PATH = "yolov8n.pt"  # pre-trained YOLOv8 nano weights
+
 IMAGE_PATH = "../data/images/object_1.jpg"
 POSE_CSV = "../data/poses/pose_labels.csv"
 OUTPUT_DIR = "../results/visualization"
