@@ -1,25 +1,26 @@
-# 6D Pose Estimation for Smart Gripper
+# Object-detection-with-pose-visualization
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Sruthi-Reddy-B/6d-pose-estimation-smart-gripper/blob/main/notebooks/pose_estimation_pipeline.ipynb)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Sruthi-Reddy-B/object-detection-with-pose-visualization/blob/main/notebooks/pose_estimation_pipeline.ipynb)
 
 ##  Overview
-This project implements a **vision-based 6D pose estimation pipeline** for a robotic gripper, inspired by my Master's thesis  
-**“Vision-Driven Automation: Smart Gripper Development for Autonomous Material Manipulation.”**
+This project demonstrates a **vision-based workflow for robotic grasping**.  
+It detects objects using **YOLOv8** and visualizes their **pose (position + orientation)** using sample/demo data.  
 
-It detects an object using **YOLOv8** and estimates its **6D pose (position + orientation)** to assist robotic manipulation.
+> Note: This is a **demo pipeline**. The pose is **synthetic / simulated**.  
+> True 6D pose prediction requires training on datasets like LINEMOD or YCB-Video.
 
 ---
 
 ##  Tech Stack
 - **Frameworks:** PyTorch, Ultralytics YOLOv8  
-- **Libraries:** OpenCV, NumPy, Matplotlib, SciPy, Pandas  
+- **Libraries:** OpenCV, NumPy, Matplotlib, Pandas  
 - **Environment:** Google Colab (GPU recommended)
 
 ---
 
 ##  Folder Structure
 ```text
-6d-pose-estimation-smart-gripper/
+Object-detection-with-pose-visualization/
 ├── data/           # RGB images and 6D pose labels
 ├── notebooks/      # Pipeline notebook
 ├── src/            # Training/inference scripts
@@ -48,19 +49,15 @@ jupyter notebook notebooks/pose_estimation_pipeline.ipynb
 ---
 
 ##  Results
-Object detected successfully with YOLOv8.
-6D pose matrix estimated (x, y, z + rotation R).
-Visualization overlays local coordinate axes on detected object.
-
-These outputs simulate the workflow of an industrial vision-gripper system.
+Detected object with YOLOv8
+Visualized axes for synthetic pose
+Saved predicted pose matrix in CSV
 
 ---
 
 ##  Next Steps / Enhancements
 
-Replace synthetic data with real RGB-D images.
-Integrate with ROS 2 for real-time robot grasping.
-
-Use YOLOv5-6D or PoseCNN for accurate orientation recovery.
-
-Add point-cloud-based refinement (Gaussian splatting / NeRF).
+-Train on real 6D pose datasets for true position + orientation prediction
+-Integrate with ROS2 for real-time grasping
+-Upgrade to YOLOv5-6D or PoseCNN for accurate orientation
+-Use point-cloud / NeRF / Gaussian splatting for more advanced robotic perception
