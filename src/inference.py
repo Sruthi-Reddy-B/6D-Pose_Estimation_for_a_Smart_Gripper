@@ -11,9 +11,9 @@ from utils import draw_axes, euler_to_rotmat, ensure_dir
 
 MODEL_PATH = "yolov8n.pt"  # pre-trained YOLOv8 downloaded in repo root
 
-#IMAGE_PATH = "./data/images/object_1.jpg"
-#POSE_CSV = "./data/poses/pose_labels.csv"
-#OUTPUT_DIR = "./results/visualization"
+IMAGE_PATH = "./data/images/object_1.jpg"
+POSE_CSV = "./data/poses/pose_labels.csv"
+OUTPUT_DIR = "./results/visualization"
 
 ensure_dir(OUTPUT_DIR)
 
