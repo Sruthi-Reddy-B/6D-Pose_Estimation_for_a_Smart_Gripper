@@ -1,4 +1,77 @@
+import cv2
+import numpy as np
+import pandas as pd
+from ultralytics import YOLO
+import os
 
+# --- Paths ---
+MODEL_PATH = "./yolov8n.pt"   # pre-trained YOLOv8 model
+IMAGE_PATH = "./data/images/object_1.jpg"
+POSE_PATH = "./data/poses/pose_labels.csv"
+SAVE_PATH = "./results/visualization/pose_axes.jpg"
+
+# --- Load YOLO model ---
+model = YOLO(MODEL_PATH)
+
+# --- Run inference ---
+results = model(IMAGE_PATH)
+result = results[0]
+img = cv2.imread(IMAGE_PATH)
+
+# --- Draw 2D bounding boxes ---
+for box in result.boxes.xyxy:
+    x1, y1, x2, y2 = map(int, box)
+    cv2.rectangle(img, (x1, y1), (x2, y2), (0, 255, 0), 2)
+
+# --- Load Pose Data ---
+pose_data = pd.read_csv(POSE_PATH)
+row = pose_data.iloc[0]
+
+# --- Extract translation ---
+t = np.array([row["x"], row["y"], row["z"]])
+
+# --- Convert roll, pitch, yaw (in degrees) to radians ---
+roll, pitch, yaw = np.deg2rad([row["roll"], row["pitch"], row["yaw"]])
+
+# --- Compute rotation matrix (R = Rz * Ry * Rx) ---
+Rx = np.array([[1, 0, 0],
+               [0, np.cos(roll), -np.sin(roll)],
+               [0, np.sin(roll),  np.cos(roll)]])
+Ry = np.array([[ np.cos(pitch), 0, np.sin(pitch)],
+               [0, 1, 0],
+               [-np.sin(pitch), 0, np.cos(pitch)]])
+Rz = np.array([[np.cos(yaw), -np.sin(yaw), 0],
+               [np.sin(yaw),  np.cos(yaw), 0],
+               [0, 0, 1]])
+
+R = Rz @ Ry @ Rx
+
+# --- Form 3x4 pose matrix ---
+pose_matrix = np.hstack((R, t.reshape(3,1)))
+print("\nEstimated 6D Pose Matrix:\n", pose_matrix)
+
+# --- Draw 3D Axes from pose matrix ---
+axis_length = 50  # adjust for visibility
+
+# Origin in 2D image (approximate projection)
+origin = (int(t[0]), int(t[1]))
+
+# Endpoints for X, Y, Z axes (using rotation directions)
+x_axis = (int(t[0] + R[0,0]*axis_length), int(t[1] + R[1,0]*axis_length))
+y_axis = (int(t[0] + R[0,1]*axis_length), int(t[1] + R[1,1]*axis_length))
+z_axis = (int(t[0] + R[0,2]*axis_length), int(t[1] + R[1,2]*axis_length))
+
+# Draw axes on image
+cv2.line(img, origin, x_axis, (0, 0, 255), 3)   # X - Red
+cv2.line(img, origin, y_axis, (0, 255, 0), 3)   # Y - Green
+cv2.line(img, origin, z_axis, (255, 0, 0), 3)   # Z - Blue
+
+# --- Save visualization ---
+os.makedirs(os.path.dirname(SAVE_PATH), exist_ok=True)
+cv2.imwrite(SAVE_PATH, img)
+print(f"\nPose visualization saved at: {SAVE_PATH}")
+
+'''
 import cv2
 import numpy as np
 import pandas as pd
@@ -73,48 +146,4 @@ save_path = os.path.join(output_dir, "pose_axes_box.jpg")
 cv2.imwrite(save_path, img_pose)
 print(f"Pose visualization with bounding box saved at: {save_path}")
 
-'''
-
-import os
-import cv2
-import numpy as np
-import pandas as pd
-from ultralytics import YOLO
-from utils import draw_axes, euler_to_rotmat, ensure_dir
-
-# --- Paths ---
-#MODEL_PATH = "results/yolo_model/yolov8_6d_pose.pt"
-
-MODEL_PATH = "yolov8n.pt"  # pre-trained YOLOv8 downloaded in repo root
-
-IMAGE_PATH = "./data/images/object_1.jpg"
-POSE_CSV = "./data/poses/pose_labels.csv"
-OUTPUT_DIR = "./results/visualization"
-
-ensure_dir(OUTPUT_DIR)
-
-# --- Load YOLO Model ---
-model = YOLO(MODEL_PATH)
-
-# --- Predict ---
-results = model.predict(source=IMAGE_PATH, save=False)
-img = cv2.imread(IMAGE_PATH)
-
-# --- Load Ground-truth / Dummy Pose Labels ---
-pose_data = pd.read_csv(POSE_CSV)
-pose = pose_data.iloc[0]  # assume single image for demo
-
-# --- Construct Pose Matrix ---
-x, y, z = pose['x'], pose['y'], pose['z']
-roll, pitch, yaw = pose['roll'], pose['pitch'], pose['yaw']
-R_mat = euler_to_rotmat(roll, pitch, yaw)
-pose_matrix = np.hstack((R_mat, np.array([[x],[y],[z]])))
-
-print("Estimated 6D Pose Matrix:\n", pose_matrix)
-
-# --- Draw Axes ---
-img_pose = draw_axes(img.copy(), (x, y), R_mat)
-out_path = os.path.join(OUTPUT_DIR, "pose_axes.jpg")
-cv2.imwrite(out_path, img_pose)
-print(f"Pose visualization saved at: {out_path}")
 '''
